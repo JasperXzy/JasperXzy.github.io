@@ -1,0 +1,83 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PublicationItem from './PublicationItem.astro';
+import { contactLinks, type Profile } from '../data/profile';
+import avatar from '../assets/profile/avatar.jpg';
+
+interface Props {
+	title: string;
+	description: string;
+	content: Profile;
+}
+
+const { title, description, content } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+	<main id="main">
+		<section class="identity" aria-labelledby="page-title">
+			<div class="identity-copy">
+				<h1 id="page-title">
+					{content.name}{' '}<span class="chinese-name" lang="zh-CN">徐正一</span>
+				</h1>
+				<p class="role">{content.role}</p>
+				<p class="affiliation">{content.affiliation}</p>
+				<nav
+					class="profile-links"
+					aria-label="Academic profiles and contact"
+				>
+					{
+						contactLinks.map((link) => (
+							<a
+								href={link.href}
+								aria-label={link.label}
+								title={link.label}
+								target={link.href.startsWith('http') ? '_blank' : undefined}
+								rel={link.href.startsWith('http') ? 'me noopener noreferrer' : undefined}
+							>
+								<img src={link.icon} alt="" width="21" height="21" />
+							</a>
+						))
+					}
+				</nav>
+			</div>
+			<Image
+				class="profile-photo"
+				src={avatar}
+				alt="Portrait of Zhengyi Xu"
+				width={154}
+				height={190}
+				loading="eager"
+			/>
+		</section>
+
+		<section class="content-section" aria-labelledby="about-heading">
+			<h2 id="about-heading">{content.sections.about}</h2>
+			<p>{content.about}</p>
+		</section>
+
+		<section class="content-section" aria-labelledby="research-heading">
+			<h2 id="research-heading">{content.sections.research}</h2>
+			<ul class="research-list">
+				{content.researchInterests.map((interest) => <li>{interest}</li>)}
+			</ul>
+		</section>
+
+		<section
+			class="content-section publications-section"
+			id="publications"
+			aria-labelledby="publications-heading"
+		>
+			<header class="publications-heading">
+				<h2 id="publications-heading">{content.sections.publications}</h2>
+				<p>{content.labels.authorNote}</p>
+			</header>
+			<PublicationItem publication={content.publication} labels={content.labels} />
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<span>© {new Date().getFullYear()} Zhengyi Xu</span>
+	</footer>
+</BaseLayout>

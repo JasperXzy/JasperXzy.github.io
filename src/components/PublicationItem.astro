@@ -1,0 +1,132 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Publication {
+	title: string;
+	authors: Array<{ name: string; self?: boolean; marker?: string }>;
+	venue: string;
+	image: ImageMetadata;
+	imageAlt: string;
+	bibUrl: string;
+	abstractUrl: string;
+	pdfUrl: string;
+	codeUrl: string;
+	websiteUrl?: string;
+}
+
+interface Props {
+	publication: Publication;
+	labels: {
+		bib: string;
+		abstract: string;
+		pdf: string;
+		code: string;
+		website: string;
+		websiteUnavailable: string;
+	};
+}
+
+const { publication, labels } = Astro.props;
+---
+
+<article class="publication">
+	<a
+		class="publication-media"
+		href={publication.abstractUrl}
+		aria-label={`${labels.abstract}: ${publication.title}`}
+		target="_blank"
+		rel="noopener noreferrer"
+	>
+		<Image
+			src={publication.image}
+			alt={publication.imageAlt}
+			width={480}
+			height={298}
+			loading="lazy"
+		/>
+	</a>
+	<div class="publication-details">
+		<h3>
+			<a
+				href={publication.abstractUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				{publication.title}
+			</a>
+		</h3>
+		<p class="publication-authors">
+			{
+				publication.authors.map((author, index) => (
+					<>
+						{index > 0 && ', '}
+						{
+							author.self ? (
+								<strong class="self-author">{author.name}</strong>
+							) : (
+								author.name
+							)
+						}
+						{author.marker && <sup>{author.marker}</sup>}
+					</>
+				))
+			}
+		</p>
+		<p class="publication-venue"><em>{publication.venue}</em></p>
+		<div class="publication-actions" aria-label="Publication links">
+			<a
+				class="paper-button"
+				href={publication.bibUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				{labels.bib}
+			</a>
+			<a
+				class="paper-button"
+				href={publication.abstractUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				{labels.abstract}
+			</a>
+			<a
+				class="paper-button"
+				href={publication.pdfUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				PDF
+			</a>
+			<a
+				class="paper-button"
+				href={publication.codeUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				{labels.code}
+			</a>
+			{
+				publication.websiteUrl ? (
+					<a
+						class="paper-button"
+						href={publication.websiteUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{labels.website}
+					</a>
+				) : (
+					<span
+						class="paper-button is-disabled"
+						aria-disabled="true"
+						title={labels.websiteUnavailable}
+					>
+						{labels.website}
+					</span>
+				)
+			}
+		</div>
+	</div>
+</article>
